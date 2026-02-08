@@ -1,0 +1,18 @@
+{
+    "category": "General",
+    "guid": "d8f3a1b2-4c5e-6f78-9a0b-c1d2e3f4a5b6",
+    "name": "DateCreated Fixer",
+    "description": "Fixes invalid DateCreated values (2000-01-01 bug) on movies and episodes by using file LastWriteTimeUtc.",
+    "owner": "custom",
+    "overview": "Automatically corrects invalid DateCreated timestamps that break Recently Added sorting",
+    "versions": [
+        {
+            "version": "1.0.0.0",
+            "changelog": "Initial release",
+            "targetAbi": "10.11.0.0",
+            "timestamp": "2026-02-08T00:00:00Z"
+        }
+    ],
+    "status": "Active",
+    "autoUpdate": false
+}
