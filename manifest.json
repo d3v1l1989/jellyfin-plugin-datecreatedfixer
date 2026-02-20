@@ -8,6 +8,14 @@
         "category": "General",
         "versions": [
             {
+                "version": "1.1.0.0",
+                "changelog": "Fix re-entrant event loop that caused CPU/memory spiral when multiple items were updated simultaneously",
+                "targetAbi": "10.11.0.0",
+                "sourceUrl": "https://github.com/d3v1l1989/jellyfin-plugin-datecreatedfixer/releases/download/v1.1.0/jellyfin-plugin-datecreatedfixer_1.1.0.0.zip",
+                "checksum": "b7b85aea1baf6d2a389db295d0efe976",
+                "timestamp": "2026-02-20T00:00:00Z"
+            },
+            {
                 "version": "1.0.0.0",
                 "changelog": "Initial release",
                 "targetAbi": "10.11.0.0",

@@ -7,10 +7,10 @@
     "overview": "Automatically corrects invalid DateCreated timestamps that break Recently Added sorting",
     "versions": [
         {
-            "version": "1.0.0.0",
-            "changelog": "Initial release",
+            "version": "1.1.0.0",
+            "changelog": "Fix re-entrant event loop causing CPU/memory spiral",
             "targetAbi": "10.11.0.0",
-            "timestamp": "2026-02-08T00:00:00Z"
+            "timestamp": "2026-02-20T00:00:00Z"
         }
     ],
     "status": "Active",

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,10 @@ public class DateCreatedFixerService : IHostedService, IDisposable
 
     private readonly ILibraryManager _libraryManager;
     private readonly ILogger<DateCreatedFixerService> _logger;
+
+    // Prevent re-entrant event loops: UpdateItemAsync fires ItemUpdated,
+    // which would call this handler again. Track items currently being fixed.
+    private readonly ConcurrentDictionary<Guid, byte> _processing = new();
 
     public DateCreatedFixerService(
         ILibraryManager libraryManager,
@@ -54,17 +59,25 @@ public class DateCreatedFixerService : IHostedService, IDisposable
             return;
         }
 
+        // Skip if this item is already being processed (prevents re-entrant loop)
+        if (!_processing.TryAdd(item.Id, 0))
+        {
+            return;
+        }
+
         try
         {
             var fileInfo = new FileInfo(item.Path);
             if (!fileInfo.Exists)
             {
+                _processing.TryRemove(item.Id, out _);
                 return;
             }
 
             var lastWrite = fileInfo.LastWriteTimeUtc;
             if (lastWrite <= BadDateThreshold || lastWrite > DateTime.UtcNow)
             {
+                _processing.TryRemove(item.Id, out _);
                 return;
             }
 
@@ -76,7 +89,6 @@ public class DateCreatedFixerService : IHostedService, IDisposable
 
             item.DateCreated = lastWrite;
 
-            // Fire and forget the async update from this synchronous event handler
             _ = Task.Run(async () =>
             {
                 try
@@ -91,16 +103,22 @@ public class DateCreatedFixerService : IHostedService, IDisposable
                 {
                     _logger.LogError(ex, "DateCreatedFixer: Failed to save {ItemName}", item.Name);
                 }
+                finally
+                {
+                    _processing.TryRemove(item.Id, out _);
+                }
             });
         }
         catch (Exception ex)
         {
+            _processing.TryRemove(item.Id, out _);
             _logger.LogError(ex, "DateCreatedFixer: Error processing {ItemName}", item.Name);
         }
     }
 
     public void Dispose()
     {
+        _processing.Clear();
         GC.SuppressFinalize(this);
     }
 }
